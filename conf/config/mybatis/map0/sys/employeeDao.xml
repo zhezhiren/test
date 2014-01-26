@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.plj.dao.sys.EmployeeDao">
+	<resultMap type="Employee" id="employee">
+		<id property="employeeId" column="EMPID"></id>
+		<result property="employeeCode" column="EMPCODE"></result>
+		<result property="operatorId" column="OPERATORID"></result>
+		<result property="userId" column="USERID"></result>
+		<result property="employeeName" column="EMPNAME"></result>
+		<result property="realName" column="REALNAME"></result>
+		<result property="gender" column="GENDER"></result>
+		<result property="birthdayDate" column="BIRTHDATE"></result>
+		<result property="position" column="POSITION"></result>
+		<result property="employeeStatus" column="EMPSTATUS"></result>
+		<result property="cardType" column="CARDTYPE"></result>
+		<result property="cardNumber" column="CARDNO"></result>
+		<result property="inDate" column="INDATE"></result>
+		<result property="outDate" column="OUTDATE"></result>
+		<result property="oTel" column="OTEL"></result>
+		<result property="oAddress" column="OADDRESS"></result>
+		<result property="oZipCode" column="OZIPCODE"></result>
+		<result property="oEmail" column="OEMAIL"></result>
+		<result property="faxNumber" column="FAXNO"></result>
+		<result property="mobileNumber" column="MOBILENO"></result>
+		<result property="msn" column="MSN"></result>
+		<result property="hTel" column="HTEL"></result>
+		<result property="hAddress" column="HADDRESS"></result>
+		<result property="hZipCode" column="HZIPCODE"></result>
+		<result property="pEmail" column="PEMAIL"></result>
+		<result property="party" column="PARTY"></result>
+		<result property="degree" column="DEGREE"></result>
+		<result property="major" column="MAJOR"></result>
+		<result property="specialty" column="SPECIALTY"></result>
+		<result property="wordExperience" column="WORKEXP"></result>
+		<result property="regDate" column="REGDATE"></result>
+		<result property="createTime" column="CREATETIME"></result>
+		<result property="lastModyTime" column="LASTMODYTIME"></result>
+		<result property="orgIdList" column="ORGIDLIST"></result>
+		<result property="orgId" column="ORGID"></result>
+		<result property="remark" column="REMARK"></result>
+		<result property="upEmployeeId" column="UPEMPID"></result>
+	</resultMap>
+	
+	<select id="getEmps" parameterType="map" resultType="EmployeeInfo">
+		SELECT emp.EMPCODE as empCode,emp.EMPID as empId,emp.GENDER as gender,emp.EMPSTATUS as empStatus,
+			emp.OPERATORID as operatorId,org.STATUS as status,org.ORGNAME as orgName
+		FROM om_employee emp,om_organization org
+		<where>
+			<if test="optionType==0">
+				<if test="orgId!=null">
+					emp.ORGID=org.ORGID AND org.ORGID=#{organizationId}
+				</if>
+			</if>
+			<if test="optionType==1">
+				<if test="selectedOrgName!=null">
+					emp.ORGID IN (SELECT ORGID FROM om_organization WHERE ORGNAME LIKE CONCAT('%',#{selectedOrgName},'%'))
+				</if>
+				<if test="employeeCode!=null">
+					AND emp.EMPCODE LIKE CONCAT('%',#{employeeCode},'%')
+				</if>
+				<if test="employeeName!=null">
+					AND emp.EMPNAME LIKE CONCAT('%',#{employeeName},'%')
+				</if>
+				<if test="operatorId!=null">
+					AND emp.OPERATORID=#{operatorId}
+				</if>
+				<if test="belongToOrgId!=null">
+					AND emp.ORGID=#{belongToOrgId}
+				</if>
+			</if>
+		</where>
+		
+	</select>
+	
+	<select id="loadEmpByOrgId" parameterType="map" resultType="EmpListInfo">
+		select
+		EMPID employeeId,
+		EMPCODE empCode,
+		EMPNAME empName,
+	   	GENDER gender,
+	    EMPSTATUS empStatus,
+	    ORGID orgId,
+	    OM_EMPLOYEE.OPERATORID ooperatorId,
+	    AC_OPERATOR.USERID uuserId,
+	    (select ORGNAME from OM_ORGANIZATION where ORGID=OM_EMPLOYEE.ORGID) orgName
+	 	from om_employee join AC_OPERATOR on OM_EMPLOYEE.OPERATORID=AC_OPERATOR.OPERATORID
+	 	<if test="orgId!=null">
+		 	where ORGID=#{orgId}
+		 	<if test="empName!=null">
+				and EMPNAME LIKE CONCAT('%',#{empName},'%') 
+			</if>
+			<if test="empCode!=null">
+				and EMPCODE LIKE CONCAT('%',#{empCode},'%') 
+			</if>
+		</if>
+		<if test="orgId==null">
+		where 1=1
+			<if test="empName!=null">
+				and EMPNAME LIKE CONCAT('%',#{empName},'%') 
+			</if>
+			<if test="empCode!=null">
+				and EMPCODE LIKE CONCAT('%',#{empCode},'%') 
+			</if> 
+		</if>
+	</select>
+	
+	<delete id="deleteEmp" parameterType="Integer">
+		delete from om_employee where OPERATORID=#{operatorId}
+		delete from AC_OPERATORROLE where OPERATORID=#{operatorId}
+		delete from ac_operator where OPERATORID = #{operatorId}
+	</delete>
+	
+	<insert id="insertEmp" parameterType="Employee">
+		insert into om_employee 
+		(EMPCODE,OPERATORID,USERID,EMPNAME,GENDER,EMPSTATUS,MOBILENO,ORGID)
+		values(#{employeeCode},#{operatorId},#{userId},#{employeeName},
+		#{gender},#{employeeStatus},#{mobileNumber},#{orgId})
+	</insert>
+	
+	<select id="loadEmpById" parameterType="String" 
+			resultType="EmpInfo">
+		select EMPID empId,
+	       EMPCODE empCode,
+	       OM_EMPLOYEE.OPERATORID operatorId,
+	       EMPNAME empName,
+	       OM_EMPLOYEE.GENDER gender,
+	       EMPSTATUS empStatus,
+	       MOBILENO mobileNo,
+	       ORGID orgId,
+	       AC_OPERATOR.STATUS status,
+	       AC_OPERATOR.USERID userId,
+	       (select ORGNAME from OM_ORGANIZATION where orgid=OM_EMPLOYEE.orgid) orgName
+	  from OM_EMPLOYEE 
+	  left join AC_OPERATOR on OM_EMPLOYEE.operatorid=AC_OPERATOR.operatorid
+	 where empid = #{empid}
+	</select>
+	
+	<update id="updateEmp" parameterType="Employee">
+		update om_employee set EMPCODE=#{employeeCode},USERID=#{userId},EMPNAME=#{employeeName},
+		GENDER=#{gender},EMPSTATUS=#{employeeStatus},MOBILENO=#{mobileNumber},ORGID=#{orgId},
+		OPERATORID=#{operatorId}
+		where EMPID=#{employeeId}
+	</update>
+	
+	<select id="getEmployeeByOperatorId" parameterType="int" resultMap="employee">
+		SELECT * FROM om_employee where OPERATORID = #{value}
+		
+	</select>
+	
+	<select id="getOperIdByEmpId" parameterType="String" resultType="Integer">
+		SELECT OPERATORID FROM om_employee where EMPID = #{value}
+	</select>
+	 
+</mapper>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.plj.dao.sys.RoleDao">
+	<resultMap type="Role" id="role" >
+		<id property="roleId" column = "ROLEID"/>
+		<result property="roleName" column = "ROLENAME"/>
+		<result property="roleType" column = "ROLETYPE"/>
+		<result property="roleDesc" column = "ROLEDESC"/>
+		<result property="applicationId" column = "APPID"/>
+	</resultMap>
+	
+	<sql id="tableField">
+		ROLEID, ROLENAME, ROLETYPE, ROLEDESC, APPID 
+	</sql>
+	
+	<sql id="insertField">
+		ROLENAME, ROLETYPE, ROLEDESC, APPID 
+	</sql>
+	
+	<insert id="save" parameterType="Role" useGeneratedKeys="true" keyProperty="roleId">
+		INSERT INTO AC_ROLE (
+		<include refid = "insertField"/>
+		) VALUES
+		(#{roleName}, #{roleType}, #{roleDesc}, #{applicationId})
+	</insert>
+	
+<!--	<update id="update" parameterType="java.util.HashMap">
+        update AC_ROLE set 
+		<if test="roleName != null">
+			<set>
+        		ROLENAME = #{roleName}
+			</set>
+		</if>
+	</update>
+  -->
+  	<update id="update" parameterType="Role" >
+  		update AC_ROLE SET ROLENAME = #{roleName},ROLETYPE = #{roleType},APPID = #{applicationId}
+		<where>
+        		ROLEID = #{roleId}			
+		</where>  		
+  	</update>   
+  	
+	<delete id="delete" statementType="CALLABLE" parameterType="string" >
+    	{CALL role_deleteRole(#{roleId})}
+	</delete>
+
+	<select id="getRoleDetailTree" resultType="map" >
+	<![CDATA[
+		select  CONCAT(FUNCCODE,'~','function') ID,CONCAT(FUNCNAME,(case ISMENU when 'y' then '&nbsp;&nbsp;<img src="foundation/images/menu.gif" />' else '' end ))  TEXT,CONCAT(FUNCGROUPID,'~','functionGroup') PARENTID from AC_FUNCTION
+		union all
+
+		select  CONCAT(FUNCGROUPID,'~','functionGroup') ID,FUNCGROUPNAME TEXT,CONCAT(PARENTGROUP,'~','functionGroup') PARENTID from AC_FUNCGROUP where PARENTGROUP is not null and PARENTGROUP!=0
+		union all
+		select  CONCAT(FUNCGROUPID,'~','functionGroup') ID,FUNCGROUPNAME TEXT,CONCAT(APPID,'~','app') PARENTID from AC_FUNCGROUP where PARENTGROUP is null or PARENTGROUP=0
+
+		union all
+		select  CONCAT(APPID,'~','app')  ID,APPNAME TEXT,'root-node' PARENTID from AC_APPLICATION
+	]]>
+	</select>
+	
+	<select id="getAllRoles" resultMap="role">
+    	select ROLEID, ROLENAME, ROLETYPE, APPID from AC_ROLE t
+	</select>
+	
+	<select id="loadAllRoles" resultMap="role">
+        SELECT ROLEID,CONCAT(ROLEID,':',ROLENAME) ROLENAME FROM AC_ROLE
+	</select>
+	
+	<select id="loadOperatorRolesById" parameterType="java.lang.String" resultMap="role">
+        select ROLEID,CONCAT(ROLEID,':',(select ROLENAME from AC_ROLE where ROLEID=t.ROLEID)) 
+        ROLENAME from AC_OPERATORROLE t where OPERATORID=#{OPERATORID}
+	</select>
+	
+	<select id="roleIdExists" parameterType="string" resultType="int">
+		select count(*) from AC_ROLE where upper(ROLEID)=upper(#{roleId})
+	</select>
+	
+	<select id="getRoleNameExists" parameterType="string" resultType="int">
+		select count(*) from AC_ROLE where upper(ROLENAME)=upper(#{roleName})
+	</select>
+	
+</mapper>

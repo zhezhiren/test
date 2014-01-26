@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.plj.dao.sys.ConRoleFunctionDao">
+	
+	
+	<sql id="tableField">
+		ROLEID, FUNCCODE, APPID, FUNCGROUPID
+	</sql>
+	
+	<insert id="addRolePerm">
+		insert into AC_ROLEFUNC(
+			<include refid="tableField" />
+		) 
+        select ${roleId}, ${functionCode},
+        (select g.APPID FROM AC_FUNCGROUP AS g LEFT JOIN AC_FUNCTION AS f 
+        ON g.FUNCGROUPID=f.FUNCGROUPID WHERE f.FUNCCODE=#{functionCode}),
+        (select FUNCGROUPID from AC_FUNCTION where FUNCCODE=#{functionCode})
+	</insert>
+	
+	<select id="fetchFuncs" parameterType="string" resultType="map">
+        select cast(FUNCCODE as char(21)) FUNCCODE from AC_ROLEFUNC where ROLEID=#{ROLEID}
+	</select>
+	
+	<delete id="deleteFuncByRole" parameterType="java.lang.String">
+        delete from AC_ROLEFUNC where ROLEID=#{roleid}
+    </delete>
+</mapper>

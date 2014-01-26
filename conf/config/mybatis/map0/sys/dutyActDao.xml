@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.plj.dao.sys.DutyActDao">
+	<resultMap type="DutyAct" id="dutyAct">
+		<id property="id" column = "id"/>
+		<result property="startTime" column = "start_time"/>
+		<result property="endTime" column = "end_time"/>
+		<result property="dutyOperatorId" column = "duty_operator_id"/>
+		<result property="dutyOperatorName" column = "duty_operator_name"/>
+		<result property="dutyLeaderId" column = "duty_leader_id"/>
+		<result property="dutyLeaderName" column = "duty_leader_name"/>
+		<result property="jobContent" column = "job_content"/>
+		<result property="warningContent" column = "warning_conent"/>
+		<result property="orgId" column = "org_id"/>
+	</resultMap>
+	
+	<sql id="tableField">
+		start_time, end_time, duty_operator_id, duty_operator_name,
+		duty_leader_id, duty_leader_name, job_content, warning_conent, org_id
+	</sql>
+	
+	<sql id="beanField">
+		#{startTime}, #{endTime}, #{dutyOperatorId}, #{dutyOperatorName}, 
+		#{dutyLeaderId}, #{dutyLeaderName}, #{jobContent}, #{warningContent}, #{orgId}
+	</sql>
+	
+	<insert id="save" parameterType="DutyAct">
+		INSERT INTO  ac_duty_act (
+			<include refid="tableField"/>
+		)
+		VALUES(
+			<include refid="beanField" />
+		)
+	</insert>
+	
+	<select id="searchDutyAct" parameterType="map" resultMap="dutyAct">
+		SELECT da.*, oe.EMPNAME AS empName FROM ac_duty_act da
+		LEFT JOIN om_employee oe ON da.duty_operator_id = oe.OPERATORID
+		<where>
+			<if test="null != empName">
+				oe.EMPNAME like #{empName}
+			</if>
+			<if test="null != startTime">
+				AND da.end_time >= #{startTime}
+			</if>
+			<if test="null != endTime">
+				<![CDATA[
+				AND da.end_time < #{endTime}
+				]]>
+			</if>
+			<choose>
+				<when test="nu != orgId">
+					AND da.org_id = #{orgId}
+				</when>
+				<otherwise>
+					AND da.org_id IS NULL
+				</otherwise>
+			</choose>	
+		</where>
+		ORDER BY da.end_time DESC
+	</select>
+	
+	<select id="getLastDutyActOfOrg" parameterType="int" resultMap="dutyAct">
+		SELECT da.*, oe.EMPNAME AS empName FROM ac_duty_act da 
+		left join om_employee oe on da.duty_operator_id = oe.OPERATORID
+		WHERE da.org_id =#{orgId} ORDER BY end_time desc LIMIT 1
+	</select>
+</mapper>

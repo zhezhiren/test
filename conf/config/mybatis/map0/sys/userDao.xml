@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.plj.dao.sys.UserDao">
+	<resultMap type="User" id="user">
+		<id property="id" column = "id"/>
+		<result property="email" column = "email"/>
+		<result property="loginName" column = "login_name"/>
+		<result property="name" column = "name"/>
+		<result property="password" column = "password"/>
+		<result property="departId" column = "depart_id"/>
+		<result property="roleId" column = "role_id"/>
+	</resultMap>
+	
+	<sql id="userTableField">
+		id, email, login_name, name, password, depart_id, role_id
+	</sql>
+	
+	<insert id="save" parameterType="User">
+		INSERT INTO user (
+		<include refid = "userTableField"/>
+		) values
+		(#{id}, #{email}, #{loginName}, #{name}, #{password}, #{departId}, #{roleId})
+	</insert>
+	
+	<select id="getUserByIdtest1" parameterType="string" resultMap="user">
+		select * from user where id=#{value}
+	</select>
+	
+	<sql id="userInfo">
+		id as userId, email, login_name as loginName, name, password, depart_id as departId, role_id as roleId
+	</sql>
+	
+	<select id="getUserByIdtest2" parameterType="map" resultType="User">
+		select 
+		<include refid = "userInfo"/>
+		from user where userId=#{userId}
+	</select>
+	
+	<delete id="deleteById" parameterType="string">
+		DELETE FROM user where id=#{value}
+	</delete>
+</mapper>

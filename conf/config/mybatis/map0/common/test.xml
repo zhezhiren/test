@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.plj.dao.common.TestDao">
+	<!-- 
+		eviction:LRU最近最少使用    FIFO先进先出   SOFT  软引用(移除基于垃圾回收器状态和软引用规则的对象) WEAK 弱引用(更积极的移除基于垃圾回收器状态和弱引用规则的对象)
+		flushInterval：刷新间隔  正整数 毫秒数 默认没有刷新间隔
+		size:缓存的对象数量   默认值是1024.
+		readOnly:只读，可设置为true||false， 为true，则所有的调用者返回缓存中相同的对象，因此这些对象不能被修改。为false，则返回对象的copy，可读写，通过序列化copy，因此对象需要实现序列化。默认为false
+		
+		type 自定义缓存对象
+	 -->
+	<cache eviction="FIFO" 
+	 flushInterval="60000"
+	 readOnly="false"
+	 size="1024"
+	 />
+	
+</mapper>

@@ -1,0 +1,32 @@
+@charset "utf-8";
+/* CSS Document   */
+
+
+body{ margin:0;}
+a{ color:#000; text-decoration:none;}
+img{ border-style:none;}
+
+
+/* 吉林登录页面CSS样式   */
+ 
+body{ background:#e2e2e2; } 
+#bg{ background:url(../images/nx/bg.png) no-repeat; width:1290px; height:650px; margin:auto; }
+#logo{ background:url(../images/nx/logo_4.png) no-repeat; width:365px;; height:56px; position:absolute; margin-top:100px; margin-left:460px;}
+#dlk{ position:absolute; margin-top:290px; margin-left:510px; width:264px; height:142px;}
+#shu{ margin-bottom:18px; width:267px; height:31px;}
+.shuru{ width:235px; height:31px; line-height:31px; margin:0; padding:0; border:1px #b6b6b6 solid; background:#f8f9fb; border-left:0; color:#999; float:right; }
+.tu{ float:left;height:33px;}
+
+#anniu{ width:264px; height:37px; margin-top:7px; }
+
+#denglu{ width:115px; height:37px; float:left; background: url(../images/nx/denglu.png) no-repeat;}
+#denglu:hover{ background: url(../images/nx/denglu1.png) no-repeat; }
+#quxiao{ width:115px; height:37px; float:right;  background: url(../images/nx/quxiao.png) no-repeat;}
+#quxiao:hover{ background: url(../images/nx/quxiao1.png) no-repeat;}
+
+
+/* 主页面top样式   */
+#top{ background:url(../images/nx/top_bg.jpg) repeat-x; height:80px; margin:0;}
+.top1{ background:url(../images/nx/top.jpg) no-repeat top center; height:80px; width:100%;}
+#L{ background:url(../images/nx/logo1.png) no-repeat left; width:428px; height:80px; } 
+#R{ background: url(../images/nx/diqiu.png) no-repeat right; width:396px; height:80px; }

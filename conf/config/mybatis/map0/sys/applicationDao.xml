@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.plj.dao.sys.ApplicationDao">
+	<resultMap type="Application" id="application">
+		<id property="applicationId" column = "APPID"/>
+		<result property="applicationCode" column = "APPCODE"/>
+		<result property="applicationName" column = "APPNAME"/>
+		<result property="applciationType" column = "APPTYPE"/>
+		<result property="isOpen" column = "ISOPEN"/>
+		<result property="openDate" column = "OPENDATE"/>
+		<result property="url" column = "URL"/>
+		<result property="applicationDesc" column = "APPDESC"/>
+		<result property="maintenance" column = "MAINTENANCE"/>
+		<result property="manaRole" column = "MANAROLE"/>
+		<result property="demo" column = "DEMO"/>
+		<result property="iniwp" column = "INIWP"/>
+		<result property="inTaskCenter" column = "INTASKCENTER"/>
+		<result property="ipAddr" column = "IPADDR"/>
+		<result property="ipPort" column = "IPPORT"/>
+	</resultMap>
+	
+	<sql id="insertField">
+		APPCODE, APPNAME, APPTYPE, ISOPEN, OPENDATE, URL, APPDESC, MAINTENANCE, MANAROLE, DEMO, INIWP, INTASKCENTER, IPADDR, IPPORT 
+	</sql>
+	
+	<sql id="tableField">
+		APPID, APPCODE, APPNAME, APPTYPE, ISOPEN, OPENDATE, URL, APPDESC, MAINTENANCE, MANAROLE, DEMO, INIWP, INTASKCENTER, IPADDR, IPPORT 
+	</sql>
+	
+	<insert id="save" parameterType="Application">
+		INSERT INTO ac_application (
+		<include refid = "insertField"/>
+		) values
+		( #{applicationCode}, #{applicationName}, #{applciationType},
+		 #{isOpen}, #{openDate}, #{url}, #{applicationDesc}, #{maintenance}, #{manaRole},
+		 #{demo}, #{iniwp}, #{inTaskCenter}, #{ipAddr}, #{ipPort})
+	</insert>
+	
+	<update id = "updateApplication" parameterType="Application">
+		UPDATE ac_application
+		<set>
+			APPNAME = #{applicationName},
+			APPTYPE = #{applciationType},
+			ISOPEN = #{isOpen},
+			IPADDR = #{ipAddr},
+			IPPORT = #{ipPort},
+			APPDESC = #{applicationDesc}
+		</set>
+		<where>
+			APPID = #{applicationId}
+		</where>
+	</update>
+	
+	<delete id="deleteApplicationsByIds" parameterType="list">
+		delete from AC_APPLICATION where APPID IN
+		<foreach item="item" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<select id="getAllApplication" resultMap="application">
+		SELECT 
+		<include refid = "tableField"/>
+		FROM ac_application
+	</select>
+	
+	<select id = "searchApplication" parameterType="map" resultMap="application">
+		SELECT 
+		<include refid="tableField"/>
+		FROM AC_APPLICATION
+		<where>
+			<if test="null != APPNAME">
+				APPNAME LIKE #{applicationName}
+			</if>
+			<if test="null != APPTYPE">
+				AND APPTYPE = #{applicationType}
+			</if>
+		</where>
+	</select>
+	
+	<select id="funcNameExists" parameterType="String" resultType="Integer">
+		SELECT count(1) From ac_function where funcname=#{funcName}
+	</select>
+	
+	<select id="funcGroupNameExists" parameterType="String" resultType="Integer">
+		SELECT count(1) From ac_funcgroup where funcgroupname=#{funcName}
+	</select>
+	
+	<insert id="insertFunction" parameterType="Function" useGeneratedKeys="true" keyProperty="functionCode">
+		INSERT INTO ac_function ( FUNCGROUPID, FUNCNAME, FUNCACTION, FUNCDESC, FUNCTYPE,ISMENU)
+		 values
+		( #{functionGroupId}, #{functionName},
+		 #{funcaction}, #{functionDesc}, 0, 'y')
+	</insert>
+	
+	<update id = "updateFunction" parameterType="Function">
+		UPDATE ac_function
+		<set>
+			FUNCNAME = #{functionName},
+			FUNCACTION = #{funcaction},
+			FUNCDESC = #{functionDesc},
+		</set>
+		<where>
+			FUNCCODE = #{functionCode}
+		</where>
+	</update>
+	
+	<delete id="deleteFunctionByIds" parameterType="list">
+		delete from ac_function where FuncCode IN
+		<foreach item="item" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<select id="appNameExits" parameterType="String" resultType="Integer">
+		SELECT count(1) From ac_application where APPNAME=#{appName}
+	</select>
+</mapper>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.plj.dao.sys.FunctionDao">
+	<resultMap type="Function" id="function">
+		<id property="functionCode" column = "FUNCCODE"/>
+		<result property="functionGroupId" column = "FUNCGROUPID"/>
+		<result property="functionName" column = "FUNCNAME"/>
+		<result property="functionDesc" column = "FUNCDESC"/>
+		<result property="funcaction" column = "FUNCACTION"/>
+		<result property="paraInfo" column = "PARAINFO"/>
+		<result property="isCheck" column = "ISCHECK"/>
+		<result property="functionType" column = "FUNCTYPE"/>
+		<result property="isMenu" column = "ISMENU"/>
+	</resultMap>
+	
+	<sql id="tableField">
+		FUNCCODE, FUNCGROUPID, FUNCNAME, FUNCDESC, FUNCACTION,
+		PARAINFO, ISCHECK, FUNCTYPE, ISMENU
+	</sql>
+
+	
+	<sql id="selectAppFunc">
+           from AC_FUNCTION 
+		<where>
+			<if test = " null != funcgroupid">
+				FUNCGROUPID  = #{funcgroupid} 
+			</if>
+		</where>
+	</sql>
+	
+	<select id="searchFunction" parameterType="java.util.HashMap" resultMap="function">  
+	    select 
+	    <include refid="tableField"/>
+		<include refid="selectAppFunc"/>
+	</select>  
+	
+</mapper>

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.plj.dao.sys.OperatorDao">
+	<resultMap type="Operator" id="operator">
+		<id property="operatorId" column = "OPERATORID"/>
+		<result property="userId" column = "USERID"/>
+		<result property="password" column = "PASSWORD"/>
+		<result property="invaldate" column = "INVALDATE"/>
+		<result property="operatorName" column = "OPERATORNAME"/>
+		<result property="authMode" column = "AUTHMODE"/>
+		<result property="status" column = "STATUS"/>
+		<result property="unlockTime" column = "UNLOCKTIME"/>
+		<result property="menuType" column = "MENUTYPE"/>
+		<result property="lastLoginTime" column = "LASTLOGIN"/>
+		<result property="loginErrorCounts" column = "ERRCOUNT"/>
+		<result property="startTime" column = "STARTDATE"/>
+		<result property="endTime" column = "ENDDATE"/>
+		<result property="validTime" column = "VALIDTIME"/>
+		<result property="macCode" column = "MACCODE"/>
+		<result property="ipAddress" column = "IPADDRESS"/>
+		<result property="email" column = "EMAIL"/>
+		<result property="passwordTMP" column = "PASSWORDTMP"/>
+		<result property="lossTime" column = "LOSSTIME"/>
+	</resultMap>
+	
+	<sql id="tableField">
+		OPERATORID, USERID, PASSWORD, INVALDATE, OPERATORNAME, 
+		AUTHMODE, STATUS, UNLOCKTIME, MENUTYPE, LASTLOGIN,  
+		ERRCOUNT, STARTDATE, ENDDATE, VALIDTIME, MACCODE,  
+		IPADDRESS, EMAIL, PASSWORDTMP, LOSSTIME 
+	</sql>
+	<sql id="tableField2">
+		USERID, PASSWORD, INVALDATE, OPERATORNAME, 
+		AUTHMODE, STATUS, UNLOCKTIME, MENUTYPE, LASTLOGIN,  
+		ERRCOUNT, STARTDATE, ENDDATE, VALIDTIME, MACCODE,  
+		IPADDRESS, EMAIL, PASSWORDTMP, LOSSTIME 
+	</sql>
+	
+	<sql id="beanField">
+		#{userId}, #{password}, #{invaldate}, #{operatorName},
+		#{authMode}, #{status}, #{unlockTime}, #{menuType}, #{lastLoginTime},
+		#{loginErrorCounts}, #{startTime}, #{endTime}, #{validTime}, #{macCode},
+		#{ipAddress}, #{email}, #{passwordTMP}, #{lossTime}
+	</sql>
+	<sql id="beanField2">
+		#{userId}, #{password}, #{invaldate}, #{operatorName},
+		#{authMode}, #{status}, #{unlockTime}, #{menuType}, #{lastLoginTime},
+		#{loginErrorCounts}, #{startTime}, #{endTime}, #{validTime}, #{macCode},
+		#{ipAddress}, #{email}, #{passwordTMP}, #{lossTime}
+	</sql>
+	
+	<insert id="save" parameterType="Operator">
+		INSERT INTO AC_OPERATOR (
+			<include refid="tableField" /> 
+		)
+		VALUES(
+			<include refid="beanField" /> 
+		)
+	</insert>
+	
+	<update id="update" parameterType="Operator">
+		update AC_OPERATOR set OPERATORNAME=#{operatorName},USERID=#{userId}
+		<if test="null != email and 'holdPreviously' != email">
+			,EMAIL = #{email}
+		</if>
+		<if test="null != password">
+			PASSWORD = #{password}
+		</if>
+		<where>
+			OPERATORID = #{operatorId}
+		</where>
+	</update>
+	
+	<update id="updateOperator" parameterType="Operator">
+		update AC_OPERATOR 
+		<set> 
+		OPERATORNAME=#{operatorName},
+		USERID=#{userId},
+		EMAIL = #{email},
+		STATUS = #{status},
+		<if test="null != password">
+			PASSWORD = #{password}
+		</if>
+		</set>		
+		<where>
+			OPERATORID=#{operatorId}
+		</where>
+    </update>
+    
+    <update id="updateLoginTime" parameterType="Operator">
+    	update AC_OPERATOR 
+		<set> 
+			LASTLOGIN=#{lastLoginTime},
+		</set>
+    	<where>
+    		OPERATORID=#{operatorId}
+    	</where>
+    </update>
+	
+	<delete id="deleteOperatorByIds" statementType="CALLABLE"  parameterType="list">
+		<if test="null != list">
+			<foreach collection="list" item = "item" >
+				{CALL operator_deleteOperator (convert(#{item}, CHAR(21)))};
+			</foreach>
+		</if>
+	</delete>
+	
+	<delete id="deleteOperatorById" statementType="CALLABLE"  parameterType="list">
+		{CALL operator_deleteOperator(#{item})};
+	</delete>
+	
+	<delete id="deleteOperatorRolesById" parameterType="integer" >
+		delete from AC_OPERATORROLE where OPERATORID=#{operatorId}
+	</delete>
+	
+	<insert id="addOperatorRoles" parameterType="Operator">
+         insert into AC_OPERATORROLE(OPERATORID,ROLEID) SELECT #{operatorId}, ROLEID from AC_ROLE
+         where ROLEID in 
+        	<foreach collection="roleIds" open = "(" item = "item" separator = "," close=")">     		
+        		#{item}
+			</foreach>
+    </insert>
+	
+	<sql id="listField">
+		AC_OPERATOR.OPERATORID as OPERATORID, AC_OPERATOR.USERID as USERID, 
+		AC_OPERATOR.OPERATORNAME as OPERATORNAME, AC_OPERATOR.STATUS as STATUS, 
+		AC_OPERATOR.LASTLOGIN as LASTLOGIN, AC_OPERATOR.EMAIL as EMAIL
+	</sql>
+	
+	<select id="getOperatorByUserId" parameterType="String" resultMap="operator">
+		SELECT 
+		<include refid="tableField" /> 
+		FROM AC_OPERATOR WHERE USERID = #{useId}
+	</select>
+	
+	<sql id="selectOperatorListWhere">
+		<where>
+			<if test="null != userId">
+				AND USERID  like CONCAT('%',#{userId},'%')
+			</if>
+			<if test="null != operatorName">
+				AND OPERATORNAME  like CONCAT('%',#{operatorName},'%')
+			</if>
+			<if test="null != orgId">
+				And om_employee.ORGID = #{orgId}
+			</if>
+		</where>
+	</sql>
+	
+	<select id="searchOperator" parameterType = "map" resultMap="operator">
+		SELECT 
+		<include refid="listField" /> 
+		FROM AC_OPERATOR 
+		<if test="null != orgId">
+			LEFT JOIN om_employee ON AC_OPERATOR.OPERATORID = om_employee.OPERATORID 
+		</if>
+		<include refid="selectOperatorListWhere"/>
+		<!-- ORDER BY OPERATORID -->
+	</select>
+	
+	<select id="getOperatorNotEmployee" parameterType = "map" resultMap="operator">
+		SELECT 
+		<include refid="listField" /> 
+		FROM AC_OPERATOR
+		<where>
+			<if test="null != userId">
+				AND USERID  like #{userId}
+			</if>
+			<if test="null != operatorName">
+				AND OPERATORNAME  like #{operatorName}
+			</if>
+			AND NOT EXISTS (SELECT 1 FROM om_employee oe WHERE oe.OPERATORID  = AC_OPERATOR.OPERATORID)
+		</where>
+	</select>
+	
+	<insert id="insertOperator" parameterType="Operator" useGeneratedKeys="true" keyProperty="operatorId">
+		INSERT INTO AC_OPERATOR
+		(<include refid="tableField2"/>)
+		 values
+		(
+		<include refid="beanField2" />
+		)
+	</insert>
+	
+	<select id="login" parameterType="map" resultMap="operator">
+		SELECT * FROM AC_OPERATOR WHERE USERID = #{userId}
+		AND PASSWORD = #{password}
+	</select>
+	
+	<update id="updateCurPassword" parameterType="map">
+		UPDATE AC_OPERATOR SET PASSWORD = #{newPassword} WHERE USERID = #{userId}
+		AND PASSWORD = #{oldPassword}
+	</update>
+	
+	<select id="loadOperatorByEmpId" parameterType="Integer" resultType="UpdateOperatorBean">
+		SELECT  emp.OPERATORID as operatorId,
+		EMPID as empId,
+		EMPCODE as empCode,
+		EMPNAME as empName,
+		GENDER as gender,
+		EMPSTATUS as empStatus,
+		MOBILENO as mobileNo,
+		ORGID as orgId,
+		oper.PASSWORD as password,
+		oper.USERID as userId,
+		oper.OPERATORNAME as operatorName,
+		oper.STATUS as status,
+		oper.EMAIL as email,
+		(select ORGNAME from OM_ORGANIZATION where ORGID=emp.ORGID) as orgName
+		from OM_EMPLOYEE emp join AC_OPERATOR oper on emp.OPERATORID=oper.OPERATORID 
+		where EMPID=#{empId}
+	</select>
+	
+</mapper>

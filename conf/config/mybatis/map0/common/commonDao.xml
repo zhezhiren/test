@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.plj.dao.common.CommonDao">
+	
+	<insert id="insert" parameterType="map">
+		INSERT INTO ${table}
+		<foreach collection="fields" open="("  item="field" separator="," close=")" >
+			${field.fieldName}
+		</foreach>
+		 VALUES
+		<foreach collection="fields" open="("  item="field" separator="," close=")" >
+			#{field.fieldValue}
+		</foreach>
+	</insert>
+	
+	<update id="updateByPrimaryKey" parameterType="map" >
+		UPDATE ${table} SET
+		<foreach collection="fields" item="field" separator=", ">
+			${field.fieldName} = #{field.fieldValue}
+		</foreach>
+		WHERE ${key.fieldName} = #{key.fieldValue}
+	</update>
+	
+	<select id="selectOne" parameterType="map" resultType="map">
+		SELECT * FROM ${table} WHERE 
+		<foreach collection="conditions" item="condition">
+			<choose>
+				<when test="null != condition.connector">
+					${condition.connector}
+				</when>
+				<otherwise>
+					${condition.fieldName} ${condition.xmlSign} #{condition.fieldValue}
+				</otherwise>
+			</choose>
+		</foreach>
+	</select>
+	
+	<select id="selectList" parameterType="map" resultType="map">
+		SELECT * FROM ${table} 
+		<if test="null != conditions">
+			WHERE 
+			<foreach collection="conditions" item="condition">
+				<choose>
+					<when test="null != condition.connector">
+						${condition.connector}
+					</when>
+					<otherwise>
+						${condition.fieldName} ${condition.xmlSign} #{condition.fieldValue}
+					</otherwise>
+				</choose>
+			</foreach>
+		</if>
+		<if test="null != orders">
+			ORDER BY 
+			<foreach collection="orders" item="order" separator=",">
+				${order.fieldName} ${order.orderDir}
+			</foreach>
+		</if>
+	</select>
+	
+	<delete id="deleteByPrimaryKey" parameterType="map" >
+		DELETE FROM ${table} WHERE ${field} = #{value}
+	</delete>
+	
+	<delete id="deleteByPrimaryKeys" parameterType="map" >
+		DELETE FROM ${table} WHERE ${field} IN 
+		<foreach collection="values" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</delete>
+	
+</mapper>

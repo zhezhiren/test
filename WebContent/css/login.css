@@ -1,0 +1,54 @@
+@charset "utf-8";
+*{ margin:0; padding:0;}
+body {
+	font:12px/18px '宋体',Arial, Helvetica, sans-serif;
+	color:#333;
+}
+img{ border:0;}
+ul,li{ list-style-type:none;}
+a:link{ color:blue}
+a:visited{color:blue}
+a:hover{}
+a:active{}
+.red{ color:red;}
+
+#head{ height:85px; background:url(../images/login/head_bg.png) repeat-x;}
+.center{ margin:auto; width:998px;}
+.p10{ padding-top:10px;}
+
+#content{ height:420px; background:url(../images/login/body_bg.png) top left repeat-x; border-bottom:1px solid #C6E4EF;}
+#content .cleft{ float:left; width:621px; margin:38px 0 0 7px;}
+#content .cright{ float:left; width:363px; height:367px; background:url(../images/login/login.jpg) left top no-repeat; margin-top:9px;}
+.cright ul{ margin-top:95px; margin-left:20px; color:#666;}
+.cright li{ display:block; margin-top:20px;}
+.cright li.btn{ padding-left:57px;}
+.cright li.btn a{ margin-left:15px; color:#999999;}
+
+.cright input,.cright label,.cright img,.cright span,.cright a{ vertical-align:middle;}
+.cright label{ font-size:14px; width:60px;}
+.input{ border:1px solid #bedce7; height:30px; width:255px; line-height:30px; font-size:14px; padding-left:5px;}
+.cright img{ margin:0 3px;}
+.w90{ width:90px;}
+
+#bottom{ text-align:center; line-height:26px; padding-top:20px; color:#666;}
+
+.regContent{ background:url(../images/login/body_bg.png) top left repeat-x; border-bottom:1px solid #C6E4EF;padding-bottom:10px; }
+.r_head{ height:48px; background:url(../images/login/register_bg.jpg) repeat-x left top; border:1px solid #b0deee;}
+.r_head h1{ padding-left:15px;}
+.r_head .fright{ float:right; line-height:48px; padding-right:10px;}
+.r_head .fright a{ text-decoration:underline; margin-left:2px;}
+
+.reghead{ height:30px; line-height:30px; padding-left:30px; background:#feff99 url(../images/login/register_09.jpg) 8px no-repeat;}
+.regForm{border:1px solid #b0deee; border-top:none; padding:2px 2px 10px 2px;}
+.form{ margin-top:20px;}
+.rtable{ border-collapse:collapse;}
+.rtable th,.rtable td{ padding:8px 5px;}
+.rtable th{ text-align:right; font:14px/20px normal Verdana, Geneva, sans-serif}
+.rtable td{ color:#999999; text-align:left;}
+.rtable label{ color:#333; font-size:14px;}
+.rtable .input{ height:22px; border:1px solid #AEAEAE; width:250px;}
+.rtable select{ height:24px; border:1px solid #AEAEAE; }
+.rtable .select{ width:258px;}
+.rtable img{ cursor:pointer;}
+.rtable a{ font-size:14px; margin-right:5px;}
+.rtable input,.rtable img{vertical-align: middle;}

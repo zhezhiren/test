@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.plj.dao.sys.SubFunctionDataDao">
+	<resultMap type="SubFunctionData" id="subFunctionData">
+		<id property="subFunctionId" column="SUBFUNCID" />
+		<result property="functionCode" column="FUNCCODE" />
+		<result property="subType" column="SUBTYPE" />
+		<result property="subDesc" column="SUBDESC" />
+		<result property="subExpression" column="SUBEXPRESSION" />
+		<result property="remark" column="REMARK" />
+	</resultMap>
+	
+	<sql id="tableField">
+		FUNCCODE, SUBTYPE, SUBDESC, SUBEXPRESSION, REMARK
+	</sql>
+	
+    <insert id="insertSubFunctionData" parameterType="SubFunctionData">
+    	INSERT INTO ac_subfunctiondata (
+    	<include refid="tableField" />
+    	) values
+    	(#{functionCode},#{subType},#{subDesc},#{subExpression},#{remark})
+    </insert>
+    <delete id="deleteSubFunctionData" 
+    		parameterType="SubFunctionDataBean">
+    	delete from ac_subfunctiondata where SUBFUNCID=#{subFuncId}
+    </delete>
+    
+    <select id="getSubFuncData" parameterType="map" resultMap="subFunctionData">
+    	SELECT SUBFUNCID,SUBTYPE,SUBEXPRESSION,SUBDESC FROM AC_SUBFUNCTIONDATA
+    	<where>
+    		<if test="null != funccode">
+           		FUNCCODE  = #{funccode}
+           	</if>
+    	</where>
+    </select>
+    <update id="updateSubFunctionData" parameterType="SubFunctionData">
+		update ac_subfunctiondata set SUBTYPE=#{subType},SUBDESC=#{subDesc},
+		SUBEXPRESSION=#{subExpression},REMARK=#{remark},FUNCCODE=#{functionCode}
+		 where SUBFUNCID = #{subFunctionId}
+	</update>
+</mapper>

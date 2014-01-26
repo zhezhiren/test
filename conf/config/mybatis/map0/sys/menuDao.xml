@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.plj.dao.sys.MenuDao">
+	<resultMap type="Menu" id="menu">
+		<id property="menuId" column = "MENUID"/>
+		<result property="menuName" column = "MENUNAME"/>
+		<result property="menuLabel" column = "MENULABEL"/>
+		<result property="menuCode" column = "MENUCODE"/>
+		<result property="isLeaf" column = "ISLEAF"/>
+		<result property="menuAction" column = "MENUACTION"/>
+		<result property="parameter" column = "PARAMETER"/>
+		<result property="uientry" column = "UIENTRY"/>
+		<result property="menuLevel" column = "MENULEVEL"/>
+		<result property="rootId" column = "ROOTID"/>
+		<result property="parentsId" column = "PARENTSID"/>
+		<result property="displayOrder" column = "DISPLAYORDER"/>
+		<result property="imagePath" column = "IMAGEPATH"/>
+		<result property="expandPath" column = "EXPANDPATH"/>
+		<result property="menuSeq" column = "MENUSEQ"/>
+		<result property="openMode" column = "OPENMODE"/>
+		<result property="subCount" column = "SUBCOUNT"/>
+		<result property="appId" column = "APPID"/>
+		<result property="funcCode" column = "FUNCCODE"/>
+	</resultMap>
+
+	
+	<sql id="allowSubMenu">
+    	(select 1 from AC_MENU menu WHERE ISLEAF = 'y'
+        AND exists (SELECT 1 FROM AC_FUNCTION F, AC_ROLEFUNC RF
+        WHERE exists (select 1 from AC_OPERATORROLE where 
+        OPERATORID = #{OPERATORID} and RF.ROLEID = ROLEID)
+        AND RF.FUNCCODE = F.FUNCCODE and menu.FUNCCODE = F.FUNCCODE
+        AND F.ISMENU = 'y' ) and menuseq like CONCAT('%.',t.menuid,'.%'))
+    </sql>
+	
+	<sql id="upMenuField">
+		select APPID from AC_FUNCGROUP 
+		where FUNCGROUPID=(select FUNCGROUPID 
+		from AC_FUNCTION where FUNCCODE=#{funcCode})
+	</sql>
+	
+	<sql id="inMenuField">
+		MENUNAME,MENULABEL,MENUCODE,ISLEAF,MENUACTION,MENULEVEL,PARENTSID,DISPLAYORDER,OPENMODE,SUBCOUNT,APPID,FUNCCODE 
+	</sql>
+	
+	<select id="getMenuByUserId" parameterType="string" resultType="map">
+		select distinct MENUID ID,
+    	MENULABEL NAME,
+    	PARENTSID PARENTID,
+    	MENUACTION ACTION,
+    	ISLEAF,
+    	DISPLAYORDER
+    	from AC_MENU t
+    	where exists
+    	<include refid="allowSubMenu"/>   
+    	ORDER BY ISLEAF,DISPLAYORDER
+	</select>
+	
+	<select id="selectFuncList" parameterType="map" resultType="map">
+		select FUNCNAME,FUNCGROUPNAME,t3.APPNAME APPNAME,FUNCACTION,
+			t2.APPID APPID,t1.FUNCCODE FUNCCODE 
+		from AC_FUNCTION t1,
+			AC_FUNCGROUP t2,AC_APPLICATION t3
+    	where t1.FUNCGROUPID=t2.FUNCGROUPID
+       		and t2.APPID=t3.APPID and t1.ISMENU='y'
+		    <if test="appName!=null">
+		    AND t3.APPNAME like CONCAT('%',#{appName},'%')
+		    </if>
+		    <if test="funcName!=null" >
+		    AND t1.FUNCNAME like CONCAT('%',#{funcName},'%')
+		    </if>
+		    <if test="funcGroupName!=null">
+		    AND t2.FUNCGROUPNAME like CONCAT('%',#{funcGroupName},'%')
+		    </if>
+	</select>
+
+	<select id="getAllMenuList" parameterType="map" resultType="map">
+		SELECT DISPLAYORDER,MENULABEL,MENUNAME,MENUCODE,
+				ISLEAF,MENULEVEL 
+		FROM AC_MENU
+		<where>
+			<if test="menuCode!=null">
+				MENUCODE=#{menuCode}
+			</if>
+			<if test="menuLevel!=null">
+				AND MENULEVEL=#{menuLevel}
+			</if>
+			<if test="menuName!=null">
+				AND MENUNAME like CONCAT('%',#{menuName},'%')
+			</if>
+			<if test="menuLabel!=null">
+				AND MENULABEL like CONCAT('%',#{menuLabel},'%')
+			</if>
+		</where>
+		order by DISPLAYORDER	
+	</select>	
+	
+	<select id="getMenuAction" resultType="map">
+	SELECT MENUID ID,
+       MENULABEL NAME,
+       PARENTSID PARENTID,
+       ISLEAF ISLEAF,
+       MENUACTION ACTION
+       from AC_MENU
+       order by DISPLAYORDER
+	</select>
+	
+	<insert id="insertMenu"  parameterType="Menu" useGeneratedKeys="true" keyProperty="menuId">
+		insert into AC_MENU(
+			<include refid="inMenuField"/>
+		) values(#{menuName},#{menuLabel},#{menuCode},
+					#{isLeaf},#{menuAction},#{menuLevel},#{parentsId},
+					#{displayOrder},#{openMode},0,#{appId},#{funcCode} )
+	</insert>
+	
+	<delete id="deleteMenuById"  parameterType="Integer">
+			delete from AC_MENU
+			<where>
+				MENUSEQ like CONCAT('%.',#{id},'.%')
+			</where>
+	</delete>
+	
+	<update id="updateMenuById" parameterType="Menu">
+		UPDATE AC_MENU 
+		<set>
+			MENUNAME=#{menuName},
+			MENULABEL=#{menuLabel},
+			MENUCODE=#{menuCode},
+			FUNCCODE=#{funcCode},
+			DISPLAYORDER=#{displayOrder},
+			<if test="parentsId!=null">
+			PARENTSID=#{parentsId},
+			</if>
+			<if test="parentsId==null">
+			PARENTSID=null,
+			</if>
+			APPID=(<include refid="upMenuField" />),
+			MENUACTION=#{menuAction},
+			ISLEAF=#{isLeaf}
+		</set>
+		<where>
+			MENUID=#{menuId}
+		</where>
+	</update>
+	
+
+	<select id="loadMenuById" parameterType="Integer" resultType="map">
+		select (select MENULABEL from AC_MENU where MENUID=t.PARENTSID) parentMenuLabel,
+	    MENUNAME menuName,
+	    MENULABEL menuLabel,
+	    MENUCODE menuCode,
+	    ISLEAF isLeaf,
+	    MENUACTION funcAtion,
+	    (select FUNCNAME from AC_FUNCTION where FUNCCODE=t.FUNCCODE) funcName,
+	    DISPLAYORDER desplayOrder,
+	    MENULEVEL menuLevel,
+	    SUBCOUNT subCount,
+	    FUNCCODE funcCode,
+	    PARENTSID parentsId
+	    from AC_MENU t
+	    <where>
+	    	MENUID=#{menuId}
+	    </where>
+	</select>
+	
+	<select id="getMenuById" parameterType="Integer" resultMap="menu">
+		select * from AC_MENU
+			<where>
+				MENUID=#{id}
+			</where>
+	</select>
+	
+	<update id="updateMenuPMenuSEQ" parameterType="map">
+			update AC_MENU set MENUSEQ=CONCAT((select IFNULL(MENUSEQ,'') from AC_MENU where MENUID=#{parentsId}),MENUID,'.') 
+			where  MENUID=#{id}
+	</update>
+	
+	<update id="updateMenuMenuSEQ" parameterType="Integer">
+			update AC_MENU set MENUSEQ=CONCAT('.',MENUID,'.') 
+			where  MENUID=#{id}
+	</update>
+	
+	<update id="updateMenuSubCount" parameterType="Integer">
+		update AC_MENU 
+			<set>
+				SUBCOUNT=IFNULL(SUBCOUNT,0)+1
+			</set>
+			<where>
+				MENUID=#{id}
+			</where>
+	</update>
+	
+	<select id="menuNodeCount" parameterType="Integer" resultType="Integer">
+		select count(*) from AC_MENU 
+		<where>
+			MENUSEQ like CONCAT('%.', #{id},'.%')
+		</where>
+	</select>
+	
+	<update id="reduceSubCount" parameterType="map">
+		update AC_MENU  
+		<set>
+			SUBCOUNT=IFNULL(SUBCOUNT,0)-#{count}
+		</set>
+		where MENUID=#{id}
+	</update>
+	
+	<update id="addSubCount" parameterType="map">
+		update AC_MENU  
+		<set>
+			SUBCOUNT=IFNULL(SUBCOUNT,0)+#{count}
+		</set>
+		where MENUID=#{id}
+	</update>
+	
+	<update id="updateLevel" parameterType="map">
+			update AC_MENU set MENULEVEL=CONCAT(MENULEVEL,#{num})
+			<where>
+				MENUSEQ like CONCAT('%.',#{id},'.%')
+			</where>
+	</update>
+	
+	<select id="selectSeqById" parameterType="Integer" resultType="String">
+		select MENUSEQ from AC_MENU where MENUID=#{menuId}
+	</select>
+	
+	<update id="updateAllSeq" parameterType="map">
+		update AC_MENU set MENUSEQ=replace(MENUSEQ,#{oldSEQ},#{newSEQ})
+	</update>
+	
+</mapper>

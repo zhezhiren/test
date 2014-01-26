@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.plj.dao.sys.WorkFlowDao">
+	<resultMap type="WorkFlow" id="workFlow">
+		<id property="id" column = "id"/>
+		<result property="name" column = "name"/>
+		<result property="orgId" column = "org_id"/>
+		<result property="startTime" column = "start_time"/>
+		<result property="endTime" column = "end_time"/>
+		<result property="handleFlow" column = "handle_flow"/>
+		<result property="remark" column = "remark"/>
+		<result property="status" column = "status"/>
+		<result property="orgName" column = "orgName"/>
+		<result property="workStatus" column = "work_status"/>
+		<result property="completeStatus" column = "complete_status"/>
+	</resultMap>
+	<sql id="insertField">
+		name,org_id,start_time,end_time,handle_flow,remark,status
+	</sql>
+	<sql id="insertValueField">
+		#{name},#{orgId},#{startTime},#{endTime},#{handle_flow},#{remark},#{status}
+	</sql>
+	<sql id="tableField">
+	</sql>
+	<select id="getWorkFlow" parameterType="Map" resultMap="workFlow">
+		SELECT a.end_time,a.handle_flow,a.id,a.name,a.org_id,a.remark,a.start_time,a.status,
+		o.ORGNAME FROM ac_work_flow a LEFT JOIN OM_ORGANIZATION o on a.org_id=o.ORGID 
+		<where>
+		<if test="null != name">
+			and name =#{name}
+		</if>
+		<if test="null != startTime">
+			<![CDATA[ and start_time >= #{startTime}   ]]>
+		</if>
+		<if test="null != entTime">
+			<![CDATA[ and start_time <=  #{endTime}   ]]>
+		</if>
+		<if test="null != orgId">
+			and org_id = #{orgId}
+		</if>
+		and a.status=#{status}
+		</where>
+	</select>
+	<select id="getWorkFlowHome" parameterType="Map" resultMap="workFlow">
+		SELECT a.name,a.end_time,a.start_time,b.id,b.work_status,b.complete_status FROM ac_work_flow a 
+		LEFT JOIN ac_work_flow_execute b  on a.id=b.flow_id AND b.end_time > #{today}
+		WHERE a.status=#{status} and a.org_id=#{orgId}  ORDER BY a.end_time ASC, start_time ASC
+	</select>
+	<select id="getWorkEndTime" parameterType="Integer" resultType="java.util.Date">
+		SELECT end_time FROM ac_work_flow_execute where id=#{id}
+	</select>
+	<select id="getWorkFlowId" resultType="Integer">
+		SELECT max(id) FROM ac_work_flow
+	</select>
+	<insert id="initWorkFlowExecute" parameterType="WorkFlowExecute">
+		INSERT INTO AC_WORK_FLOW_EXECUTE(flow_id,work_status,org_id,end_time,complete_status)values(
+		#{flowId},#{workStatus},#{orgId},#{endTime},#{completeStatus})
+	</insert>
+	<insert id="addWorkFlow" parameterType="WorkFlow" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO AC_WORK_FLOW( 
+		<include refid="insertField" />
+		)values(
+		<include refid="insertValueField"/>
+		)
+	</insert>
+	<update id="deleteWorkFlow" parameterType="Map">
+		UPDATE AC_WORK_FLOW
+		<set>
+			status = #{status}
+		</set>
+		<where>
+			id = #{id}
+		</where>
+	</update>
+	<update id="cancelRemindWork" parameterType="Map">
+		UPDATE AC_WORK_FLOW_EXECUTE
+		<set>
+			work_status = #{workStatus}
+		</set>
+		<where>
+			id = #{id}
+		</where>
+	</update>
+	<update id="completeWorkFlow" parameterType="Map">
+		UPDATE AC_WORK_FLOW_EXECUTE
+		<set>
+			work_status = #{workStatus},
+			complete_status = #{completeStatus}
+		</set>
+		<where>
+			id = #{id}
+		</where>
+	</update>
+	<update id = "updateWorkFlow" parameterType="WorkFlow">
+		UPDATE AC_WORK_FLOW
+		<set>
+			name = #{name},
+			start_time = #{startTime},
+			end_time = #{endTime},
+			remark = #{remark}
+		</set>
+		<where>
+			id = #{id}
+		</where>
+	</update>
+	
+	<update id = "updateWorkFlowExecute" parameterType="map">
+		UPDATE AC_WORK_FLOW_EXECUTE
+		<set>
+			end_time = #{endTime},
+		</set>
+		<where>
+			flow_id = #{flowId} AND end_time > #{today}
+		</where>
+	</update>
+	
+	<select id="getUnInitWorkFlow" parameterType ="java.util.Date" resultMap="workFlow">
+		SELECT flow.* FROM ac_work_flow flow WHERE status = 'normal' AND NOT EXISTS(
+		SELECT 1 FROM ac_work_flow_execute fexe 
+		WHERE fexe.flow_id = flow.id AND fexe.end_time > #{toDay})
+	</select>
+	
+</mapper>

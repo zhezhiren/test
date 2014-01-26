@@ -1,0 +1,66 @@
+@charset "utf-8";
+/* CSS Document   */
+
+
+body{ margin:0;}
+a{ color:#000; text-decoration:none;}
+img{ border-style:none;}
+ul{ list-style:none;}
+body{ background:#e2e2e2; } 
+
+
+/* 宁夏登录页面CSS样式   */
+
+body{ background:#e2e2e2; } 
+#bg{ background:url(../images/nx/bg.png) no-repeat; width:1290px; height:650px; margin:auto; }
+#logo{ background:url(../images/nx/logo3.png) no-repeat; width:578px; height:66px; position:absolute; margin-top:120px; margin-left:365px;}
+#dlk{ position:absolute; margin-top:290px; margin-left:510px; width:264px; height:142px;}
+#shu{ margin-bottom:18px; width:267px; height:31px;}
+.shuru{ width:235px; height:31px; line-height:31px; margin:0; padding:0; border:1px #b6b6b6 solid; background:#f8f9fb; border-left:0; color:#999; float:right; }
+.tu{ float:left;height:33px;}
+#top_t{ width:360px;  height:20px; float:right; margin-right:0; margin-top:68px;}
+.zi{ color:white; margin:0;}
+ .zi a{ color:white;}
+   .zi a:hover{ color:white;}
+
+#anniu{ width:264px; height:37px; margin-top:7px; }
+
+#denglu{ width:115px; height:37px; float:left; background: url(../images/nx/denglu.png) no-repeat;}
+#denglu:hover{ background: url(../images/nx/denglu1.png) no-repeat; }
+#quxiao{ width:115px; height:37px; float:right;  background: url(../images/nx/quxiao.png) no-repeat;}
+#quxiao:hover{ background: url(../images/nx/quxiao1.png) no-repeat;}
+
+
+/* 主页面top样式  旧的  */
+/*#top{ background:url(../images/nx/top_bg.jpg) repeat-x; height:75px; margin:0;}
+.top1{ background:url(../images/nx/top.jpg) no-repeat top center; height:75px; width:100%;}
+#L{ background:url(../images/nx/logo3.png) no-repeat left; width:478px; height:75px; } 
+#R{ background: url(../images/nx/diqiu.png) no-repeat right; width:396px; height:75px; }
+
+*/
+
+/* 主页面top样式  201307131632 
+#top{ background:url(../images/nx/top1.jpg) no-repeat right; height:80px; margin:0;}
+.top1{ height:80px; width:100%;}
+#M{ pading-left:20px;}
+#L{ background:url(../images/nx/logo5.png) no-repeat left bottom; width:493px; height:50px;} 
+.liebiao{ float:left; background: url(../images/nx/biaoqian_bg.png) no-repeat; width:93px; height:27px;font-size:15px;font-family:"微软雅黑";line-height:27px; margin-right:10px; padding-bottom:1px; padding-top:1px; }
+.liebiao:hover{ color:#000; font-weight:bold;}
+*/
+
+
+#top{ background:url(../images/nx/top5.jpg) no-repeat right; height:80px; margin:0;}
+.top1{ height:80px; width:100%;}
+#L{ background:url(../images/nx/logo8.png) no-repeat center; width:550px; height:70px;} 
+
+.liebiao{ float:left; background: url(../images/nx/biaoqian_bg.png) no-repeat; width:92px; height:27px;font-size:15px;font-family:"微软雅黑"; line-height:27px; margin-right:5px; padding-bottom:1px; padding-top:1px; }
+.liebiao:hover{ cursor:pointer; color:#fff; font-weight:bold;background: url(../images/nx/biaoqian_bg1.png) no-repeat;}
+.liebiao:visited{ color:#fff; font-weight:bold; background: url(../images/nx/biaoqian_bg1.png) no-repeat;}
+
+
+#R{  width:159px;  float:right; }
+#huan{ float:right; color:#fff; font-weight:bold;  font-size:12px; margin-top:20px; padding-right:8px; padding-left:5px;}
+#ri{float:right; color:#fff; font-size:12px; width:125px;margin-top:3px;}
+#tui {float:right; margin-top:3px; width:154px; margin-right:0px;  height:16px; line-height:16px;}
+#tui a{color:#fff;font-size:12px; }
+#tui a:hover{ color: #FF3;}

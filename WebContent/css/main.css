@@ -1,0 +1,44 @@
+@charset "utf-8";
+/* CSS Document */
+
+body{ margin:0px; font-size:12px; background:#eef0f1;}
+ul{ list-style:none;}
+a{ color:#000; text-decoration:none;}
+img{ border-style:none;}
+
+ 
+/*头部样式*/
+#top{ background: url(images/main/top_1.jpg) no-repeat right; height:90px;width:100%; overflow:hidden; margin:0;}
+#logo{ width:432px; height:86px; float:left;margin-left:5px; margin-top:0px; background: url(images/main/logo1.png) no-repeat;}
+#top_t{ width:360px;  height:20px; float:right; margin-right:0; margin-top:68px;}
+.zi{ color:white; margin:0;}
+ .zi a{ color:white;}
+   .zi a:hover{ color:white;}
+
+
+/*导航样式*/
+#nav{ background: url(images/main/nav.jpg) repeat-x; margin:0 auto; height:42px; width:100%; float:left; overflow:hidden;}
+#nav ul{ list-style:none; margin:0; padding:0; margin-left:100px; }
+#nav ul li{ float:left; }
+#nav ul li a{ display:block; color:#133cac; height: 42px; line-height: 42px; padding-left:15px; padding-right:18px; }
+#nav ul li a:hover{ background: url(images/main/nav_h.jpg) repeat-x; color:#FFF;}
+#nav ul li a:hover .tu1{ background:url(images/main/tu1_1.png) no-repeat;}
+#nav ul li a:hover .tu2{ background:url(images/main/tu2_1.png) no-repeat;}
+#nav ul li a:hover .tu3{ background:url(images/main/tu3_1.png) no-repeat;}
+#nav ul li a:hover .tu4{ background:url(images/main/tu4_1.png) no-repeat;}
+#nav ul li a:hover .tu5{ background:url(images/main/tu6_1.png) no-repeat;}
+#nav ul li a:hover .tu6{ background:url(images/main/tu7_1.png) no-repeat;}
+#nav ul li a:hover .tu7{ background:url(images/main/tu8_1.png) no-repeat;}
+#nav ul li a:hover .tu8{ background:url(images/main/tu9_1.png) no-repeat;}
+
+.tu1{float:left; background:url(images/main/tu1.png) no-repeat; margin-top:10px; padding-right:3px; width:21px; height:19px;}
+.tu2{float:left; background:url(images/main/tu2.png) no-repeat; margin-top:10px; padding-right:3px; width:21px; height:19px;}
+.tu3{float:left; background:url(images/main/tu3.png) no-repeat; margin-top:10px; padding-right:3px; width:21px; height:19px;}
+.tu4{float:left; background:url(images/main/tu4.png) no-repeat; margin-top:10px; padding-right:3px; width:21px; height:19px;}
+.tu5{float:left; background:url(images/main/tu6.png) no-repeat; margin-top:10px; padding-right:3px; width:21px; height:19px;}
+.tu6{float:left; background:url(images/main/tu7.png) no-repeat; margin-top:10px; padding-right:3px; width:21px; height:19px;}
+.tu7{float:left; background:url(images/main/tu8.png) no-repeat; margin-top:10px; padding-right:3px; width:21px; height:19px;}
+.tu8{float:left; background:url(images/main/tu9.png) no-repeat; margin-top:10px; padding-right:3px; width:21px; height:19px;}
+.tu10{float:left; background:url(images/main/tu1.png) no-repeat; margin-top:10px; padding-right:3px; width:21px; height:19px;}
+
+#gexian{ float:left; width:2px; height:39px; background:url(images/main/gexian.jpg) no-repeat;}

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.plj.dao.sys.OrganizationDao">
+	<resultMap type="Organization" id="organizationResultMap">
+		<id property="organizationId" column = "ORGID"/>
+		<result property="organizationName" column = "ORGNAME"/>
+		<result property="organizationCode" column = "ORGCODE"/>
+		<result property="organizationDegree" column = "ORGDEGREE"/>
+		<result property="organizationLevel" column = "ORGLEVEL"/>
+		<result property="parentOrganizationId" column = "PARENTORGID"/>
+		<result property="organizationSeq" column = "ORGSEQ"/>
+		<result property="organizationType" column = "ORGTYPE"/>
+		<result property="organizationAddress" column = "ORGADDR"/>
+		<result property="zipCode" column = "ZIPCODE"/>
+		<result property="manaposition" column = "MANAPOSITION"/>
+		<result property="managerid" column = "MANAGERID"/>
+		<result property="organizationManager" column = "ORGMANAGER"/>
+		<result property="linkMan" column = "LINKMAN"/>
+		<result property="linkTel" column = "LINKTEL"/>
+		<result property="email" column = "EMAIL"/>
+		<result property="webURL" column = "WEBURL"/>
+		<result property="startDate" column = "STARTDATE"/>
+		<result property="endDate" column = "ENDDATE"/>
+		<result property="status" column = "STATUS"/>
+		<result property="area" column = "AREA"/>
+		<result property="creatTime" column = "CREATETIME"/>
+		<result property="lastUpdate" column = "LASTUPDATE"/>
+		<result property="updator" column = "UPDATOR"/>
+		<result property="sortNo" column = "SORTNO"/>
+		<result property="isLeaf" column = "ISLEAF"/>
+		<result property="subCount" column = "SUBCOUNT"/>
+		<result property="webName" column = "WEBNAME"/>
+		<result property="remark" column = "REMARK"/>
+		<result property="agentLevel" column = "AGENTLVL"/>
+		<result property="referralID" column = "REFERRALID"/>
+		<result property="accountName" column = "ACCOUNTNAME"/>
+		<result property="accountNumber" column = "ACCOUNTNUMBER"/>
+		<result property="bankName" column = "BANKNAME"/>
+		<result property="openBank" column = "OPENBANK"/>
+		<result property="subCnt" column = "SUBCNT"/>
+		<result property="mineCnt" column = "MINECNT"/>
+		<result property="dwMcjc" column = "dwmcjc"/>
+		<result property="dwLb" column = "dwlb"/>
+		<result property="dwLbNotes" column = "dwlbnotes"/>
+	</resultMap>
+	
+	<resultMap type="OrgInfo" id="orgInfoResultMap">
+		<result property="orgName" column = "ORGNAME"/>
+		<result property="orgType" column = "ORGTYPE"/>
+		<result property="area" column = "AREA"/>
+		<result property="linkName" column = "LINKMAN"/>
+		<result property="linkTel" column = "LINKTEL"/>	
+		<result property="status" column = "STATUS"/>
+		<result property="remark" column = "REMARK"/>
+		<result property="managerId" column = "MANAGERID"/>	
+	</resultMap>
+	<resultMap type="OrganizationTreeBean" id="orgTree">
+		<result property="orgName" column = "ORGNAME"/>
+	</resultMap>
+	<sql id="tableField">
+		ORGID, ORGNAME, ORGTYPE,ORGCODE, ORGSEQ, ORGLEVEL, STATUS
+	</sql>
+	
+	<select id="getOrgTrees" parameterType="Map" resultMap="orgTree">
+		SELECT ORGNAME FROM OM_ORGANIZATION WHERE ORGNAME!=''
+	</select>
+	<select id="getOrgTree" resultType="map">
+		SELECT ORGID ID, ORGNAME NAME,PARENTORGID PARENTID, ORGTYPE , ORGSEQ, ORGLEVEL, STATUS,ISLEAF
+        from OM_ORGANIZATION order by ISLEAF
+	</select>
+	<select id = "searchOrganization" parameterType="map" resultMap="organizationResultMap">
+		SELECT 
+		<include refid="tableField"/>
+		FROM OM_ORGANIZATION
+		<where>
+				1=1
+				<if test="null != organizationId">
+			 	   and ORGID = #{organizationId}
+				</if>
+				<if test="null != organizationCode">
+					AND ORGCODE LIKE #{organizationCode}
+				</if>
+				<if test="null != organizationName">
+					AND ORGNAME LIKE #{organizationName}
+				</if>
+				<if test="null != organizationType">
+					AND ORGTYPE LIKE #{organizationType}
+				</if>
+				<if test="null != status">
+					AND STATUS LIKE #{status}
+				</if>
+		</where>
+	</select>
+	<insert id="insertOrg" parameterType="Organization">
+		insert into om_organization 
+			(ORGNAME,ORGCODE,ORGLEVEL,ORGTYPE,STATUS,AREA,ACCOUNTNAME,
+			ACCOUNTNUMBER,BANKNAME,OPENBANK,REMARK,PARENTORGID,ISLEAF)
+		values(#{organizationName},#{organizationCode},
+			#{organizationLevel},#{organizationType},#{status},#{area},
+			#{accountName},#{accountNumber},#{bankName},#{openBank},#{remark},
+			#{parentOrganizationId},#{isLeaf})
+	</insert>
+	
+	<delete id="deleteOrg" parameterType="Integer">
+		delete from om_organization where ORGID=#{organizationId}
+	</delete>
+	
+	<select id="orgCodeExists" parameterType="OrgCodeExistsBean"
+			resultType="Integer">
+		select count(*) from om_organization where ORGCODE=#{orgCode}
+		<if test="orgId!=null">
+			<![CDATA[
+			and ORGID <> #{orgId} 
+			]]>
+		</if>
+	</select>
+	
+	<select id="empCodeExists" parameterType="EmpCodeExistsBean"
+			resultType="Integer">
+		select count(*) from om_employee where EMPCODE=#{empCode}
+		<if test="empId!=null">
+			<![CDATA[
+			and EMPID <> #{empId} 
+			]]>
+		</if>
+	</select>
+
+	<select id="orgNameExists" parameterType="String" resultType="Integer">
+		select count(*) from om_organization where ORGNAME=#{orgName}
+	</select>
+
+	<update id="updateOrgById" parameterType="UpdateOrgByIdBean">
+		update  om_organization set 
+			ORGCODE=#{orgCode},ORGNAME=#{orgName},ORGTYPE=#{orgType},STATUS=#{status},
+			AREA=#{area},ACCOUNTNAME=#{acCountName},ACCOUNTNUMBER=#{acCountNumber},
+			BANKNAME=#{bankName},OPENBANK=#{openBank},REMARK=#{remark},
+			PARENTORGID=#{parentOrgId},ISLEAF=#{isLeaf} 
+		where ORGID=#{orgId}
+	</update>
+	
+	<select id="loadOrgById" parameterType="String" resultMap="orgInfoResultMap">
+		SELECT ORGNAME,ORGTYPE,AREA,LINKMAN,LINKTEL,STATUS,REMARK,MANAGERID
+		FROM om_organization
+		WHERE ORGID=#{orgId}
+	</select>
+	<select id="loadParentOrg" parameterType="String" resultMap="orgInfoResultMap">
+		SELECT ORGNAME,ORGTYPE,AREA,LINKMAN,LINKTEL,STATUS,REMARK,MANAGERID
+		FROM om_organization
+		WHERE ORGID=#{orgId}		
+	</select>
+	<select id="loadOrgInfoById" parameterType="String" resultType="OrgInfoById">
+	   SELECT  AREA infoArea,(SELECT AREANAME FROM om_area WHERE AREA=t.AREA) displayArea,
+	   (SELECT ORGNAME FROM om_organization WHERE ORGID=t.PARENTORGID) parentOrgName,PARENTORGID infoParentOrgId,
+	   ORGNAME orgName, ORGCODE orgCode, ISLEAF isLeaf, REMARK remark
+	   FROM om_organization t WHERE ORGID=#{orgId} limit 1
+   </select>
+   <select id="loadArea" parameterType="map" resultType="AreaBean">
+   		select AREA area,UPAREA upArea,AREANAME areaName,NODELVL nodelvl
+   		from om_area
+   		<where>
+   			1=1
+   			<if test="areaName!=null">
+   				and AREANAME like CONCAT('%',#{areaName},'%')
+   			</if>
+   			<if test="area!=null">
+   				and AREA like CONCAT('%',#{area},'%')
+   			</if>
+   		</where>
+   </select>
+</mapper>	
+
+

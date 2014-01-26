@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.plj.dao.sys.DutyPlanDao">
+	<resultMap type="DutyPlan" id="dutyPlan">
+		<id property="id" column = "id"/>
+		<result property="startTime" column = "start_time"/>
+		<result property="endTime" column = "end_time"/>
+		<result property="dutyOperatorId" column = "duty_operator_id"/>
+		<result property="dutyOperatorName" column = "duty_operator_name"/>
+		<result property="dutyLeaderId" column = "duty_leader_id"/>
+		<result property="dutyLeaderName" column = "duty_leader_name"/>
+		<result property="orgId" column = "org_id"/>
+		<result property="jobContent" column="job_content" />
+	</resultMap>
+	
+	<sql id="dutyPlanTableField">
+		start_time, end_time, duty_operator_id, duty_operator_name,
+		duty_leader_id, duty_leader_name, org_id, job_content
+	</sql>
+	
+	<sql id="dutyPlanBeanField">
+		#{startTime}, #{endTime}, #{dutyOperatorId}, #{dutyOperatorName}, 
+		#{dutyLeaderId}, #{dutyLeaderName}, #{orgId}, #{jobContent}
+	</sql>
+	
+	<insert id="save" parameterType="DutyPlan" >
+		INSERT INTO ac_duty_plan (
+			<include refid="dutyPlanTableField"/>
+		)
+		VALUES
+		(
+			<include refid="dutyPlanBeanField"/>
+		)
+	</insert>
+	
+	<update id="update" parameterType="DutyPlan">
+		UPDATE ac_duty_plan SET start_time = #{startTime}, end_time = #{endTime}
+		, duty_operator_id = #{dutyOperatorId}, duty_operator_name = #{dutyOperatorName}
+		, duty_leader_id = #{dutyLeaderId},duty_leader_name = #{dutyLeaderName}, org_id = #{orgId}
+		, job_content = #{jobContent} WHERE id = #{id}
+	</update>
+	
+	<delete id="deleteByIds" parameterType="list">
+		DELETE FROM ac_duty_plan WHERE id IN
+		<foreach collection="list" open = "(" item = "item" separator = ", " close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<select id="getPossibleDutyPlan" parameterType="map" resultMap="dutyPlan">
+		SELECT * FROM (
+		SELECT TOP 1 * FROM ac_duty_plan WHERE end_time > #{time} 
+		AND org_id = #{orgId} ORDER BY end_time ASC
+		) tc
+		union all
+		SELECT * FROM (
+		<![CDATA[
+		SELECT TOP 1 * FROM ac_duty_plan WHERE end_time < #{time}
+		AND org_id = #{orgId} ORDER BY end_time ASC
+		]]>
+		) tb;
+	</select>
+	
+	<select id="searchDutyPlan" parameterType="map" resultMap="dutyPlan">
+		SELECT dp.*, oe.EMPNAME AS empName FROM ac_duty_plan dp left join 
+		om_employee oe ON dp.duty_operator_id = oe.OPERATORID
+		<where>
+			<if test="null != empName">
+				oe.EMPNAME like #{empName}
+			</if>
+			<if test="null != startTime">
+				AND dp.end_time >= #{startTime}
+			</if>
+			<if test="null != endTime">
+				<![CDATA[
+				AND dp.end_time < #{endTime}
+				]]>
+			</if>
+			<choose>
+				<when test="nu != orgId">
+					AND dp.org_id = #{orgId}
+				</when>
+				<otherwise>
+					AND dp.org_id IS NULL
+				</otherwise>
+			</choose>	
+		</where> 
+		ORDER BY dp.end_time DESC
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.plj.dao.sys.FunctionGroupDao">
+	
+	<resultMap type="FunctionGroup" id="functionGroup">
+		<id property="functionGroupId" column = "FUNCGROUPID"/>
+		<result property="applicationId" column = "APPID"/>
+		<result property="functionGroupName" column = "FUNCGROUPNAME"/>
+		<result property="parentGroup" column = "PARENTGROUP"/>
+		<result property="groupLevel" column = "GROUPLEVEL"/>
+		<result property="functionGroupSeq" column = "FUNCGROUPSEQ"/>
+		<result property="isLeaf" column = "ISLEAF"/>
+		<result property="subCount" column = "SUBCOUNT"/>
+	</resultMap>
+	
+	<sql id="tableField">
+		FUNCGROUPID, APPID, FUNCGROUPNAME, PARENTGROUP,
+		GROUPLEVEL, FUNCGROUPSEQ, ISLEAF, SUBCOUNT
+	</sql>
+	
+	<insert id="insertFuncGroup" parameterType="FunctionGroup" 
+				useGeneratedKeys="true" keyProperty="functionGroupId">
+		insert into AC_FUNCGROUP(APPID,FUNCGROUPNAME,PARENTGROUP,ISLEAF)
+			values(
+				#{applicationId}, #{functionGroupName}, #{parentGroup},'n'
+			)
+	</insert>
+	
+	<update id="updateParentGroup" parameterType="Integer">
+		update AC_FUNCGROUP set PARENTGROUP=null
+			where PARENTGROUP=0
+			and FUNCGROUPID=#{parentGroup}
+	</update>
+	
+	<select id="searchCount" parameterType="Integer" resultType="Integer">
+		select count(*) from AC_FUNCGROUP 
+			where FUNCGROUPID=#{parentGroup}
+	</select>
+	
+	<update id="updateFuncGroupSEQ" parameterType="Integer">
+		update AC_FUNCGROUP set funcGroupSEQ=CONCAT('.',FUNCGROUPID,'.')
+			where FUNCGROUPID=#{funcGroupId}
+	</update>
+	
+	<update id="updateFuncGroupSEQ_P" parameterType="map">
+		update AC_FUNCGROUP set FUNCGROUPSEQ=
+			CONCAT((select FUNCGROUPSEQ from AC_FUNCGROUP where FUNCGROUPID=#{parentGroup}),FUNCGROUPID,'.')  
+			where FUNCGROUPID=#{funcGroupId}
+	</update>
+	
+	<delete id="deleteById" parameterType="Integer">
+		begin
+			delete from AC_FUNCTION where  FUNCGROUPID in 
+				(select funcgroupid from AC_FUNCGROUP where FUNCGROUPSEQ like CONCAT('%.',#{id},'.%' ));
+		delete from AC_FUNCGROUP 
+			where FUNCGROUPSEQ like CONCAT('%.',#{id},'.%');
+		end
+		
+	</delete>
+	
+	
+	<select id = "searchFunctionGroups" parameterType="map" resultMap="functionGroup">
+		select 
+		<include refid="tableField"/>
+		FROM AC_FUNCGROUP 
+		<where>
+			<if test="appId != null">
+				APPID  = #{appId}  
+			</if>
+		</where>
+		ORDER BY FUNCGROUPSEQ ASC
+	</select>
+	
+	<!-- bu shi yong-->
+	<select id = "getFuncGroupTree" parameterType="string" resultType="map">
+		SELECT 
+		<include refid="tableField"/>   
+		FROM AC_FUNCGROUP
+		<where>
+			<if test="appId != null">
+				APPID  = #{appId}  
+			</if>
+		</where>
+		order by FUNCGROUPSEQ asc
+	</select>
+	
+	<update id="updateById" parameterType="FunctionGroup">
+		update AC_FUNCGROUP set FUNCGROUPNAME=#{functionGroupName}
+			where FUNCGROUPID=#{functionGroupId}
+	</update>
+	
+</mapper>
